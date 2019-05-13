@@ -6,8 +6,8 @@
 class ContributesToQueryDependencyGraph:
     """
     This is a mixin class which helps to keep track
-    of dependencies between query objects (and other
-    contributing classes).
+    of dependencies between query objects and other
+    contributing classes.
 
     If a class inherits from this mixin, this marks it
     as being taken into consideration when constructing
