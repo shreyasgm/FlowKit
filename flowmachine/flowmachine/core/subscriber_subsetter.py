@@ -10,6 +10,7 @@ from typing import List
 from abc import abstractmethod
 from sqlalchemy.sql import ClauseElement, select, text, column
 from .query import Query
+from .query_dependencies import ContributesToQueryDependencyGraphMixin
 
 __all__ = [
     "make_subscriber_subsetter",
@@ -19,7 +20,7 @@ __all__ = [
 ]
 
 
-class SubscriberSubsetterBase:
+class SubscriberSubsetterBase(ContributesToQueryDependencyGraphMixin):
     """
     Base class for the different types of subscriber subsets.
     """
