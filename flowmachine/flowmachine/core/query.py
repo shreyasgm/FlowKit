@@ -46,7 +46,7 @@ logger = structlog.get_logger("flowmachine.debug", submodule=__name__)
 MAX_POSTGRES_NAME_LENGTH = 63
 
 
-class Query(metaclass=ABCMeta, ContributesToQueryDependencyGraphMixin):
+class Query(ContributesToQueryDependencyGraphMixin, metaclass=ABCMeta):
     """
     The core base class of the flowmachine module. This should handle
     all input and output methods for our sql queries, so that
