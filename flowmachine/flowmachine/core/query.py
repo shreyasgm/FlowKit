@@ -31,7 +31,7 @@ from flowmachine.core.query_state import QueryStateMachine
 from abc import ABCMeta, abstractmethod
 
 from flowmachine.core.errors import NameTooLongError, NotConnectedError
-from flowmachine.core.query_dependencies import ContributesToQueryDependencyGraph
+from flowmachine.core.query_dependencies import ContributesToQueryDependencyGraphMixin
 
 import flowmachine
 from flowmachine.utils import _sleep
@@ -46,7 +46,7 @@ logger = structlog.get_logger("flowmachine.debug", submodule=__name__)
 MAX_POSTGRES_NAME_LENGTH = 63
 
 
-class Query(metaclass=ABCMeta, ContributesToQueryDependencyGraph):
+class Query(metaclass=ABCMeta, ContributesToQueryDependencyGraphMixin):
     """
     The core base class of the flowmachine module. This should handle
     all input and output methods for our sql queries, so that

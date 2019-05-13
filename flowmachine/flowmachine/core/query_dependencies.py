@@ -3,7 +3,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 
-class ContributesToQueryDependencyGraph:
+class ContributesToQueryDependencyGraphMixin:
     """
     This is a mixin class which helps to keep track
     of dependencies between query objects and other
@@ -30,7 +30,7 @@ class ContributesToQueryDependencyGraph:
         """
         dependencies = set()
         for x in self.__dict__.values():
-            if isinstance(x, ContributesToQueryDependencyGraph):
+            if isinstance(x, ContributesToQueryDependencyGraphMixin):
                 dependencies.add(x)
         lists = [
             x
@@ -39,7 +39,7 @@ class ContributesToQueryDependencyGraph:
         ]
         for l in lists:
             for x in l:
-                if isinstance(x, ContributesToQueryDependencyGraph):
+                if isinstance(x, ContributesToQueryDependencyGraphMixin):
                     dependencies.add(x)
 
         return dependencies
