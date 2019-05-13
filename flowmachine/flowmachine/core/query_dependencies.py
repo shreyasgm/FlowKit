@@ -18,3 +18,28 @@ class ContributesToQueryDependencyGraph:
     which do not represent full query objects but contribute
     to their construction (for example subsetters).
     """
+
+    @property
+    def dependencies(self):
+        """
+
+        Returns
+        -------
+        set
+            The set of objects which this one is directly dependent on.
+        """
+        dependencies = set()
+        for x in self.__dict__.values():
+            if isinstance(x, ContributesToQueryDependencyGraph):
+                dependencies.add(x)
+        lists = [
+            x
+            for x in self.__dict__.values()
+            if isinstance(x, list) or isinstance(x, tuple)
+        ]
+        for l in lists:
+            for x in l:
+                if isinstance(x, ContributesToQueryDependencyGraph):
+                    dependencies.add(x)
+
+        return dependencies

@@ -729,31 +729,6 @@ class Query(metaclass=ABCMeta, ContributesToQueryDependencyGraph):
         except NotImplementedError:
             logger.debug("Table has no standard name.")
 
-    @property
-    def dependencies(self):
-        """
-
-        Returns
-        -------
-        set
-            The set of queries which this one is directly dependent on.
-        """
-        dependencies = set()
-        for x in self.__dict__.values():
-            if isinstance(x, Query):
-                dependencies.add(x)
-        lists = [
-            x
-            for x in self.__dict__.values()
-            if isinstance(x, list) or isinstance(x, tuple)
-        ]
-        for l in lists:
-            for x in l:
-                if isinstance(x, Query):
-                    dependencies.add(x)
-
-        return dependencies
-
     def _get_stored_dependencies(
         self, exclude_self=False, discovered_dependencies=None
     ):
