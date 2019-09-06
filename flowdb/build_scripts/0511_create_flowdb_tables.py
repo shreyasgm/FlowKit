@@ -8,10 +8,8 @@ from sqlalchemy import (
     Column,
     Text,
     Boolean,
-    Integer,
     TIMESTAMP,
     Numeric,
-    String,
 )
 from sqlalchemy.schema import CreateSchema
 
@@ -22,8 +20,6 @@ conn_str = "postgresql://{}:{}@localhost:5432/flowdb_revised_schema".format(
     postgres_user, postgres_password
 )
 engine = create_engine(conn_str)
-
-print("[DDD] conn_str={}".format(conn_str))
 
 if not engine.dialect.has_schema(engine, "events"):
     engine.execute(CreateSchema("events"))
