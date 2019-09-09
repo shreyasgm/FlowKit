@@ -6,6 +6,8 @@ from sqlalchemy import (
     MetaData,
     Table,
     Column,
+    ForeignKey,
+    Boolean,
     Integer,
     Text,
     TIMESTAMP,
@@ -14,6 +16,7 @@ from sqlalchemy import (
 )
 from geoalchemy2 import Geometry
 from sqlalchemy.schema import CreateSchema
+from sqlalchemy.dialects.postgresql import UUID
 
 postgres_user = os.environ["POSTGRES_USER"]
 postgres_password = os.environ["POSTGRES_PASSWORD"]
@@ -76,25 +79,68 @@ cell_locations = Table(
     schema="infrastructure",
 )
 
-# events_calls = Table(
-#     "calls",
-#     metadata,
-#     Column("id", Text()),
-#     Column("outgoing", Boolean()),
-#     Column("datetime", TIMESTAMP(timezone=True), nullable=False),
-#     Column("duration", Numeric()),
-#     Column("network", Text()),
-#     Column("msisdn", Text(), nullable=False),
-#     Column("msisdn_counterpart", Text()),
-#     Column("location_id", Text()),
-#     Column("imsi", Text()),
-#     Column("imei", Text()),
-#     Column("tac", Numeric(8)),
-#     Column("operator_code", Numeric()),
-#     Column("country_code", Numeric()),
-#     schema="events",
-# )
+subscribers = Table(
+    "subscribers",
+    metadata,
+    Column(
+        "id",
+        Integer(),
+        primary_key=True,
+        comment="FlowDB_internal subscriber identifier.",
+    ),
+    Column("msisdn", Text(), nullable=False, comment="MSISDN"),
+    Column("imei", Text(), nullable=False, comment="IMEI"),
+    Column("imsi", Text(), nullable=False, comment="IMSI"),
+    Column("tac", Text(), nullable=False, comment="TAC"),
+)
 
+events_calls = Table(
+    "calls",
+    metadata,
+    Column(
+        "id",
+        UUID(as_uuid=True),
+        primary_key=True,
+        comment="FlowdDB-internal identifier for call events.",
+    ),
+    Column(
+        "start_time",
+        TIMESTAMP(timezone=True),
+        nullable=False,
+        comment="Timestamp of the start of the call.",
+    ),
+    Column("duration", Integer(), comment="Call duration in seconds"),
+    schema="events",
+)
+
+events_call_parties = Table(
+    "call_parties",
+    metadata,
+    Column(
+        "id", UUID(), ForeignKey("events.calls.id"), comment="Call event identifier"
+    ),
+    Column(
+        "is_outgoing",
+        Boolean(),
+        nullable=False,
+        comment="If TRUE, the record refers to the calling subscriber; if FALSE, the record refers to the receiving subscriber.",
+    ),
+    Column(
+        "subscriber_id",
+        Integer(),
+        ForeignKey("subscribers.id"),
+        comment="Subscriber who initiated or received the call (depending on the value of `is_outgoing`).",
+    ),
+    Column(
+        "cell_id",
+        Integer(),
+        ForeignKey("infrastructure.cells.id"),
+        comment="Cell connected to by the subscriber.",
+    ),
+    schema="events",
+)
+
+create_schema_if_not_exists("events")
 create_schema_if_not_exists("infrastructure")
 metadata.create_all(bind=engine)
 
