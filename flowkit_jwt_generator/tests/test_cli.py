@@ -5,7 +5,7 @@ import os
 import jwt
 from click.testing import CliRunner
 
-from flowkit_jwt_generator.jwt import print_token, print_all_access_token
+from flowkit_jwt_generator.jwt import print_token
 
 
 def test_universal_token_builder(dummy_flowapi, public_key, private_key_bytes):
@@ -64,10 +64,11 @@ def test_token_builder(private_key_bytes, public_key):
             "--query-name",
             "DUMMY_QUERY",
             "query",
-            "-a",
+            "-s",
             "admin3",
-            "-a",
+            "-s",
             "admin0",
+            "-H",
             "--query-name",
             "DUMMY_QUERY_B",
         ],
@@ -83,11 +84,14 @@ def test_token_builder(private_key_bytes, public_key):
     assert decoded["identity"] == "DUMMY_USER"
     assert decoded["user_claims"]["DUMMY_QUERY"] == {
         "permissions": {"run": True, "poll": True},
-        "spatial_aggregation": [],
+        "aggregations": {"spatial_aggregation": [], "histogram_aggregation": False},
     }
     assert decoded["user_claims"]["DUMMY_QUERY_B"] == {
         "permissions": {},
-        "spatial_aggregation": ["admin3", "admin0"],
+        "aggregations": {
+            "spatial_aggregation": ["admin3", "admin0"],
+            "histogram_aggregation": True,
+        },
     }
 
 

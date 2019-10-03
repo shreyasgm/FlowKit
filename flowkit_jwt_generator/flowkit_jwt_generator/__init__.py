@@ -5,7 +5,7 @@
 from .jwt import (
     generate_token,
     get_all_claims_from_flowapi,
-    aggregation_types,
+    spatial_aggregation_types,
     permissions_types,
     generate_keypair,
     load_private_key,

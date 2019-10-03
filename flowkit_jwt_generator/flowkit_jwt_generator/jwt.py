@@ -20,7 +20,7 @@ from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 
 permissions_types = {"run": True, "poll": True, "get_result": True}
-aggregation_types = ["admin0", "admin1", "admin2", "admin3", "admin4"]
+spatial_aggregation_types = ["admin0", "admin1", "admin2", "admin3", "admin4"]
 
 
 # Duplicated in FlowAuth (cannot use this implementation there because
@@ -190,21 +190,23 @@ def get_all_claims_from_flowapi(
             pass
     query_kinds = sorted(query_kinds)
     aggregation_types = sorted(aggregation_types)
-    all_claims = {
-        query_kind: {
-            "permissions": permissions_types,
-            "spatial_aggregation": aggregation_types,
-        }
-        for query_kind in query_kinds
-    }
+    all_claims = dict.fromkeys(
+        query_kinds,
+        dict(
+            permissions=permissions_types,
+            aggregations=dict(
+                spatial_aggregation=aggregation_types, histogram_aggregation=True
+            ),
+        ),
+    )
     all_claims.update(
-        {
-            "geography": {
-                "permissions": permissions_types,
-                "spatial_aggregation": aggregation_types,
-            },
-            "available_dates": {"permissions": {"get_result": True}},
-        }
+        dict(
+            geography=dict(
+                permissions=permissions_types,
+                aggregations=dict(spatial_aggregation=aggregation_types),
+            ),
+            available_dates=dict(permissions=dict(get_result=True)),
+        )
     )
     return all_claims
 
@@ -281,23 +283,29 @@ def output_token(claims, username, private_key, lifetime, audience):
     help="Types of access allowed.",
 )
 @click.option(
-    "--aggregation",
-    "-a",
-    type=click.Choice(aggregation_types),
+    "--spatial-aggregation",
+    "-s",
+    type=click.Choice(spatial_aggregation_types),
     multiple=True,
     help="Spatial aggregation level of access allowed.",
 )
-def named_query(query_name, permission, aggregation):
-    if len(permission) == 0 and len(aggregation) == 0:
+@click.option(
+    "--histogram-aggregation/--no-histogram-aggregation", "-H/--H", default=False
+)
+def named_query(query_name, permission, spatial_aggregation, histogram_aggregation):
+    if len(permission) == 0 and len(spatial_aggregation) == 0:
         click.confirm(
             f"This will grant _no_ permissions for '{query_name}'. Are you sure?",
             abort=True,
         )
     return {
-        query_name: {
-            "permissions": {p: True for p in permission},
-            "spatial_aggregation": aggregation,
-        }
+        query_name: dict(
+            permissions={p: True for p in permission},
+            aggregations=dict(
+                spatial_aggregation=spatial_aggregation,
+                histogram_aggregation=histogram_aggregation,
+            ),
+        )
     }
 
 

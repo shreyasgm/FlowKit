@@ -50,15 +50,23 @@ def dummy_flowapi(monkeypatch):
     return {
         "DUMMY_QUERY_KIND": {
             "permissions": {"get_result": True, "poll": True, "run": True},
-            "spatial_aggregation": ["admin0", "admin1", "admin2", "admin3"],
+            "aggregations": {
+                "spatial_aggregation": ["admin0", "admin1", "admin2", "admin3"],
+                "histogram_aggregation": True,
+            },
         },
         "DUMMY_QUERY_WITH_NO_AGGREGATIONS_KIND": {
             "permissions": {"get_result": True, "poll": True, "run": True},
-            "spatial_aggregation": ["admin0", "admin1", "admin2", "admin3"],
+            "aggregations": {
+                "spatial_aggregation": ["admin0", "admin1", "admin2", "admin3"],
+                "histogram_aggregation": True,
+            },
         },
         "available_dates": {"permissions": {"get_result": True}},
         "geography": {
             "permissions": {"get_result": True, "poll": True, "run": True},
-            "spatial_aggregation": ["admin0", "admin1", "admin2", "admin3"],
+            "aggregations": {
+                "spatial_aggregation": ["admin0", "admin1", "admin2", "admin3"]
+            },
         },
     }
