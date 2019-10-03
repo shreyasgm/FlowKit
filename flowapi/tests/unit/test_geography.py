@@ -27,7 +27,7 @@ async def test_get_geography(app, access_token_builder, dummy_zmq_server):
         {
             "geography": {
                 "permissions": {"get_result": True},
-                "spatial_aggregation": [aggregation_unit],
+                "aggregations": {"spatial_aggregation": [aggregation_unit]},
             }
         }
     )
@@ -68,7 +68,7 @@ async def test_get_geography_status(
         {
             "geography": {
                 "permissions": {"get_result": True},
-                "spatial_aggregation": ["DUMMY_AGGREGATION"],
+                "aggregations": {"spatial_aggregation": ["DUMMY_AGGREGATION"]},
             }
         }
     )
@@ -92,7 +92,7 @@ async def test_geography_errors(response, app, dummy_zmq_server, access_token_bu
         {
             "geography": {
                 "permissions": {"get_result": True},
-                "spatial_aggregation": ["DUMMY_AGGREGATION"],
+                "aggregations": {"spatial_aggregation": ["DUMMY_AGGREGATION"]},
             }
         }
     )

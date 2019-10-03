@@ -66,7 +66,8 @@ class UserObject:
             try:
                 action_rights = self.claims[query_kind]["permissions"][action]
                 aggregation_right = (
-                    aggregation_unit in self.claims[query_kind]["spatial_aggregation"]
+                    aggregation_unit
+                    in self.claims[query_kind]["aggregations"]["spatial_aggregation"]
                 )
                 if not action_rights:
                     raise UserClaimsVerificationError(

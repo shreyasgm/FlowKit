@@ -17,7 +17,7 @@ async def test_post_query(app, dummy_zmq_server, access_token_builder):
         {
             "daily_location": {
                 "permissions": {"run": True},
-                "spatial_aggregation": ["admin3"],
+                "aggregations": {"spatial_aggregation": ["admin3"]},
             }
         }
     )

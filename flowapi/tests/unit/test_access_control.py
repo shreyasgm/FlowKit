@@ -43,9 +43,11 @@ async def test_granular_run_access(
         {
             query_kind: {
                 "permissions": {"run": True},
-                "spatial_aggregation": [
-                    exemplar_query_params[query_kind]["aggregation_unit"]
-                ],
+                "aggregations": {
+                    "spatial_aggregation": [
+                        exemplar_query_params[query_kind]["aggregation_unit"]
+                    ]
+                },
             }
         }
     )
@@ -79,9 +81,11 @@ async def test_granular_poll_access(
         {
             query_kind: {
                 "permissions": {"poll": True},
-                "spatial_aggregation": [
-                    exemplar_query_params[query_kind]["aggregation_unit"]
-                ],
+                "aggregations": {
+                    "spatial_aggregation": [
+                        exemplar_query_params[query_kind]["aggregation_unit"]
+                    ]
+                },
             }
         }
     )
@@ -131,9 +135,11 @@ async def test_granular_json_access(
         {
             query_kind: {
                 "permissions": {"get_result": True},
-                "spatial_aggregation": [
-                    exemplar_query_params[query_kind]["aggregation_unit"]
-                ],
+                "aggregations": {
+                    "spatial_aggregation": [
+                        exemplar_query_params[query_kind]["aggregation_unit"]
+                    ]
+                },
             }
         }
     )
@@ -169,15 +175,25 @@ async def test_granular_json_access(
 @pytest.mark.parametrize(
     "claims",
     [
-        {"permissions": {"get_result": True}, "spatial_aggregation": []},
-        {"permissions": {}, "spatial_aggregation": ["DUMMY_AGGREGATION"]},
+        {
+            "permissions": {"get_result": True},
+            "aggregations": {"spatial_aggregation": []},
+        },
+        {
+            "permissions": {},
+            "aggregations": {
+                "aggregations": {"spatial_aggregation": ["DUMMY_AGGREGATION"]}
+            },
+        },
         {
             "permissions": {"get_result": True},
             "spatial_aggregation": ["A_DIFFERENT_AGGREGATION"],
         },
         {
             "permissions": {"get_result": False},
-            "spatial_aggregation": ["DUMMY_AGGREGATION"],
+            "aggregations": {
+                "aggregations": {"spatial_aggregation": ["DUMMY_AGGREGATION"]}
+            },
         },
     ],
 )
@@ -264,7 +280,7 @@ async def test_access_logs_post(
 
     """
     token = access_token_builder(
-        {query_kind: {"permissions": {}, "spatial_aggregation": []}}
+        {query_kind: {"permissions": {}, "aggregations": {"spatial_aggregation": []}}}
     )
     response = await app.client.post(
         f"/api/0/run",
@@ -287,51 +303,69 @@ async def test_access_logs_post(
     "metric_claims, location_claims, expected_status_code",
     [
         (
-            {"permissions": {"get_result": True}, "spatial_aggregation": []},
             {
                 "permissions": {"get_result": True},
-                "spatial_aggregation": ["DUMMY_AGGREGATION"],
+                "aggregations": {"spatial_aggregation": []},
+            },
+            {
+                "permissions": {"get_result": True},
+                "aggregations": {
+                    "aggregations": {"spatial_aggregation": ["DUMMY_AGGREGATION"]}
+                },
             },
             403,
         ),
         (
             {
                 "permissions": {"get_result": True},
-                "spatial_aggregation": ["DUMMY_AGGREGATION"],
+                "aggregations": {
+                    "aggregations": {"spatial_aggregation": ["DUMMY_AGGREGATION"]}
+                },
             },
-            {"permissions": {"get_result": True}, "spatial_aggregation": []},
+            {
+                "permissions": {"get_result": True},
+                "aggregations": {"spatial_aggregation": []},
+            },
             403,
         ),
         (
             {
                 "permissions": {"get_result": True},
-                "spatial_aggregation": ["DUMMY_AGGREGATION"],
+                "aggregations": {"spatial_aggregation": ["DUMMY_AGGREGATION"]},
             },
             {
                 "permissions": {"get_result": True},
-                "spatial_aggregation": ["DUMMY_AGGREGATION"],
+                "aggregations": {"spatial_aggregation": ["DUMMY_AGGREGATION"]},
             },
             200,
         ),
         (
             {
                 "permissions": {"get_result": False},
-                "spatial_aggregation": ["DUMMY_AGGREGATION"],
+                "aggregations": {
+                    "aggregations": {"spatial_aggregation": ["DUMMY_AGGREGATION"]}
+                },
             },
             {
                 "permissions": {"get_result": True},
-                "spatial_aggregation": ["DUMMY_AGGREGATION"],
+                "aggregations": {
+                    "aggregations": {"spatial_aggregation": ["DUMMY_AGGREGATION"]}
+                },
             },
             403,
         ),
         (
             {
                 "permissions": {"get_result": True},
-                "spatial_aggregation": ["DUMMY_AGGREGATION"],
+                "aggregations": {
+                    "aggregations": {"spatial_aggregation": ["DUMMY_AGGREGATION"]}
+                },
             },
             {
                 "permissions": {"get_result": False},
-                "spatial_aggregation": ["DUMMY_AGGREGATION"],
+                "aggregations": {
+                    "aggregations": {"spatial_aggregation": ["DUMMY_AGGREGATION"]}
+                },
             },
             403,
         ),

@@ -27,7 +27,7 @@ async def test_get_query(app, access_token_builder, dummy_zmq_server):
         {
             "modal_location": {
                 "permissions": {"get_result": True},
-                "spatial_aggregation": ["DUMMY_AGGREGATION"],
+                "aggregations": {"spatial_aggregation": ["DUMMY_AGGREGATION"]},
             }
         }
     )
@@ -94,7 +94,7 @@ async def test_get_json_status_code(
         {
             "modal_location": {
                 "permissions": {"get_result": True},
-                "spatial_aggregation": ["DUMMY_AGGREGATION"],
+                "aggregations": {"spatial_aggregation": ["DUMMY_AGGREGATION"]},
             }
         }
     )

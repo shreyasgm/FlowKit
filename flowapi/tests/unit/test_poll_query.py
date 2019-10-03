@@ -18,7 +18,7 @@ async def test_poll_bad_query(app, access_token_builder, dummy_zmq_server):
         {
             "modal_location": {
                 "permissions": {"poll": True},
-                "spatial_aggregation": ["DUMMY_AGGREGATION"],
+                "aggregations": {"spatial_aggregation": ["DUMMY_AGGREGATION"]},
             }
         }
     )
@@ -59,7 +59,7 @@ async def test_poll_query(
         {
             "modal_location": {
                 "permissions": {"poll": True},
-                "spatial_aggregation": ["DUMMY_AGGREGATION"],
+                "aggregations": {"spatial_aggregation": ["DUMMY_AGGREGATION"]},
             }
         }
     )
