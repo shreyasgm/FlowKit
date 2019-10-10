@@ -3,6 +3,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import pytest
+from flask_jwt_extended.exceptions import UserClaimsVerificationError
 
 from flowapi.flowapi_errors import (
     BadQueryError,
@@ -16,6 +17,8 @@ from flowapi.permissions import (
     get_aggregate_query_kind,
     get_kind,
     get_aggregation_unit,
+    verify_can_do_action,
+    has_access_nonspatial,
 )
 
 
@@ -68,3 +71,55 @@ def test_get_kind_raises_error_when_missing():
 def test_get_aggregation_unit_raises_error_when_missing():
     with pytest.raises(MissingQueryKindError):
         get_aggregation_unit(dict())
+
+
+def test_verify_can_do_action():
+    assert verify_can_do_action(
+        claims=dict(dummy_query=dict(permissions=dict(test_action=True))),
+        query_kind="dummy_query",
+        action="test_action",
+    )
+
+
+def test_verify_can_do_action_raises_on_unverified():
+    with pytest.raises(
+        UserClaimsVerificationError,
+        match="Token does not allow test_action for query kind 'dummy_query'",
+    ):
+        verify_can_do_action(
+            claims=dict(dummy_query=dict(permissions=dict(test_action=False))),
+            query_kind="dummy_query",
+            action="test_action",
+        )
+
+
+def test_has_access_nonspatial():
+    assert has_access_nonspatial(
+        claims=dict(
+            dummy_query=dict(
+                aggregations=dict(test_aggregation=True),
+                permissions=dict(test_action=True),
+            )
+        ),
+        query_kind="dummy_query",
+        action="test_action",
+        aggregation="test_aggregation",
+    )
+
+
+def test_has_access_nonspatial_raises_on_unverified():
+    with pytest.raises(
+        UserClaimsVerificationError,
+        match="Token does not allow aggregate 'test_aggregation' of query kind 'dummy_query'",
+    ):
+        has_access_nonspatial(
+            claims=dict(
+                dummy_query=dict(
+                    aggregations=dict(test_aggregation=False),
+                    permissions=dict(test_action=True),
+                )
+            ),
+            query_kind="dummy_query",
+            action="test_action",
+            aggregation="test_aggregation",
+        )
