@@ -9,6 +9,7 @@ from flowapi.flowapi_errors import (
     BadQueryError,
     AggregationUnitMismatchError,
     MissingQueryKindError,
+    MissingAggregationUnitError,
 )
 from flowapi.permissions import (
     get_spatial_aggregate_kind_and_claims,
@@ -69,7 +70,7 @@ def test_get_kind_raises_error_when_missing():
 
 
 def test_get_aggregation_unit_raises_error_when_missing():
-    with pytest.raises(MissingQueryKindError):
+    with pytest.raises(MissingAggregationUnitError):
         get_aggregation_unit(dict())
 
 
