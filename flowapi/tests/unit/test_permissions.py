@@ -105,7 +105,7 @@ def test_has_access_nonspatial():
         ),
         query_kind="dummy_query",
         action="test_action",
-        aggregation="test_aggregation",
+        aggregate_kind="test_aggregation",
     )
 
 
@@ -123,7 +123,7 @@ def test_has_access_nonspatial_raises_on_unverified():
             ),
             query_kind="dummy_query",
             action="test_action",
-            aggregation="test_aggregation",
+            aggregate_kind="test_aggregation",
         )
 
 
@@ -135,7 +135,7 @@ def test_has_access_nonspatial_no_verify_with_missing_key():
             claims=dict(),
             query_kind="dummy_query",
             action="test_action",
-            aggregation="test_aggregation",
+            aggregate_kind="test_aggregation",
         )
 
 
