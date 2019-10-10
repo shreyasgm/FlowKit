@@ -36,3 +36,12 @@ class MissingAggregationUnitError(JSONHTTPException):
             description="Aggregation unit must be specified when running a query.",
             name="Bad query",
         )
+
+
+class AggregationUnitMismatchError(JSONHTTPException):
+    def __init__(self):
+        super().__init__(
+            status_code=400,
+            description="Different aggregation units for metric and location are not currently supported.",
+            name="Bad query",
+        )

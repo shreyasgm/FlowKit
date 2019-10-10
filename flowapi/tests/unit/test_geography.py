@@ -41,7 +41,7 @@ async def test_get_geography(app, access_token_builder, dummy_zmq_server):
         headers={"Authorization": f"Bearer {token}"},
     )
     gjs = loads(await response.get_data())
-    assert 200 == response.status_code
+    assert response.status_code == 200
     assert "FeatureCollection" == gjs["type"]
     assert [{"some": "valid"}, {"json": "bits"}] == gjs["features"]
     assert "application/geo+json" == response.headers["content-type"]
@@ -101,4 +101,4 @@ async def test_geography_errors(response, app, dummy_zmq_server, access_token_bu
         f"/api/0/geography/DUMMY_AGGREGATION",
         headers={"Authorization": f"Bearer {token}"},
     )
-    assert 500 == response.status_code
+    assert response.status_code == 500

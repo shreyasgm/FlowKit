@@ -248,10 +248,10 @@ FlowMachine usage log:
 		"level": "admin3",
 		"subscriber_subset": "all"
 	},
-	"message": "b'{\"request_id\":\"d2892489-8fb8-40ec-94e6-2467266a0226\",\"action\":\"get_params\",\"query_id\":\"ddc61a04f608dee16fff0655f91c2057\"}'",
+	"message": "b'{\"request_id\":\"d2892489-8fb8-40ec-94e6-2467266a0226\",\"action\":\"get_params_from_flowmachine\",\"query_id\":\"ddc61a04f608dee16fff0655f91c2057\"}'",
 	"request_id": "d2892489-8fb8-40ec-94e6-2467266a0226",
 	"params": { "query_id": "ddc61a04f608dee16fff0655f91c2057" },
-	"event": "get_params",
+	"event": "get_params_from_flowmachine",
 	"logger": "flowmachine.query_run_log",
 	"level": "info",
 	"timestamp": "2019-01-10T14:11:03.339602Z"
