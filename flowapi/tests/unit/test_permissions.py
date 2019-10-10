@@ -20,6 +20,7 @@ from flowapi.permissions import (
     get_aggregation_unit,
     verify_can_do_action,
     has_access_nonspatial,
+    get_verifier,
 )
 
 
@@ -124,3 +125,31 @@ def test_has_access_nonspatial_raises_on_unverified():
             action="test_action",
             aggregation="test_aggregation",
         )
+
+
+def test_has_access_nonspatial_no_verify_with_missing_key():
+    with pytest.raises(
+        UserClaimsVerificationError, match="Claims verification failed."
+    ):
+        has_access_nonspatial(
+            claims=dict(),
+            query_kind="dummy_query",
+            action="test_action",
+            aggregation="test_aggregation",
+        )
+
+
+def test_verify_access_nonspatial():
+    assert get_verifier(
+        query_json=dict(
+            query_kind="histogram_aggregate", metric=dict(query_kind="dummy_query")
+        )
+    )(
+        claims=dict(
+            dummy_query=dict(
+                aggregations=dict(histogram_aggregate=True),
+                permissions=dict(test_action=True),
+            )
+        ),
+        action="test_action",
+    )

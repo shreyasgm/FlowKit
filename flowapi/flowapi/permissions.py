@@ -43,7 +43,7 @@ def verify_can_do_action(*, claims: dict, action: str, query_kind: str) -> bool:
 
 
 def has_access_nonspatial(
-    *, claims: dict, action: str, query_kind: str, aggregation: str
+    *, claims: dict, action: str, query_kind: str, aggregate_kind: str
 ) -> bool:
     """
     Returns true if claims permit 'action' with this kind of query at this unit of aggregation.
@@ -56,7 +56,7 @@ def has_access_nonspatial(
         Action to check
     query_kind : str
         Type of the query
-    aggregation : str
+    aggregate_kind : str
         Kind of aggregate
 
     Returns
@@ -71,10 +71,10 @@ def has_access_nonspatial(
     """
     try:
         verify_can_do_action(claims=claims, action=action, query_kind=query_kind)
-        aggregation_right = claims[query_kind]["aggregations"][aggregation]
+        aggregation_right = claims[query_kind]["aggregations"][aggregate_kind]
         if not aggregation_right:
             raise UserClaimsVerificationError(
-                f"Token does not allow aggregate '{aggregation}' of query kind '{query_kind}'"
+                f"Token does not allow aggregate '{aggregate_kind}' of query kind '{query_kind}'"
             )
     except KeyError:
         raise UserClaimsVerificationError("Claims verification failed.")
