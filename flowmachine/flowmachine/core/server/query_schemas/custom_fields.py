@@ -9,7 +9,7 @@ from marshmallow import fields, Schema, validates_schema, ValidationError, post_
 from marshmallow.validate import Range, Length, OneOf
 
 
-class Range(Schema):
+class Bounds(Schema):
     """
     Schema representing a range (i.e. lower and upper bound, both required, lower bound must be less than upper.
     """
