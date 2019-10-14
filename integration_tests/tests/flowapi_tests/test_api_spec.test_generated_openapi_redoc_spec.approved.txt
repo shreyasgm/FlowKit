@@ -75,7 +75,6 @@
           }
         },
         "required": [
-          "query_kind",
           "seed"
         ],
         "type": "object"
@@ -330,6 +329,9 @@
             "$ref": "#/components/schemas/Geography"
           },
           {
+            "$ref": "#/components/schemas/HistogramAggregate"
+          },
+          {
             "$ref": "#/components/schemas/JoinedSpatialAggregate"
           },
           {
@@ -471,6 +473,84 @@
           "start_date"
         ],
         "type": "object"
+      },
+      "HistogramAggregate": {
+        "properties": {
+          "bins": {
+            "$ref": "#/components/schemas/HistogramBins"
+          },
+          "metric": {
+            "$ref": "#/components/schemas/HistogrammableMetrics"
+          },
+          "query_kind": {
+            "enum": [
+              "histogram_aggregate"
+            ],
+            "type": "string"
+          },
+          "range": {
+            "items": {
+              "format": "float",
+              "type": "number"
+            },
+            "maxItems": 2,
+            "minItems": 2,
+            "type": "array"
+          }
+        },
+        "required": [
+          "bins",
+          "metric",
+          "query_kind"
+        ],
+        "type": "object"
+      },
+      "HistogramBins": {
+        "properties": {
+          "bin_list": {
+            "items": {
+              "format": "float",
+              "type": "number"
+            },
+            "type": "array"
+          },
+          "n_bins": {
+            "format": "int32",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "HistogrammableMetrics": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/Displacement"
+          },
+          {
+            "$ref": "#/components/schemas/EventCount"
+          },
+          {
+            "$ref": "#/components/schemas/NocturnalEvents"
+          },
+          {
+            "$ref": "#/components/schemas/ParetoInteractions"
+          },
+          {
+            "$ref": "#/components/schemas/RadiusOfGyration"
+          },
+          {
+            "$ref": "#/components/schemas/SubscriberDegree"
+          },
+          {
+            "$ref": "#/components/schemas/TopUpAmount"
+          },
+          {
+            "$ref": "#/components/schemas/TopUpBalance"
+          },
+          {
+            "$ref": "#/components/schemas/UniqueLocationCounts"
+          }
+        ]
       },
       "InputToAggregateNetworkObjects": {
         "oneOf": [
@@ -1179,7 +1259,6 @@
           }
         },
         "required": [
-          "query_kind",
           "seed"
         ],
         "type": "object"
@@ -1293,7 +1372,6 @@
           }
         },
         "required": [
-          "query_kind",
           "seed"
         ],
         "type": "object"

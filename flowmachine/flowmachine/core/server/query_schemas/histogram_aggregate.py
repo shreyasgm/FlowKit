@@ -3,10 +3,10 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 from marshmallow import Schema, fields, post_load, validates_schema, ValidationError
-from marshmallow.validate import OneOf
+from marshmallow.validate import OneOf, Length
 from marshmallow_oneofschema import OneOfSchema
 
-from flowmachine.core.server.query_schemas.custom_fields import Bounds
+
 from flowmachine.core.server.query_schemas.radius_of_gyration import (
     RadiusOfGyrationSchema,
 )
@@ -75,8 +75,8 @@ class HistogramAggregateSchema(Schema):
     # query_kind parameter is required here for claims validation
     query_kind = fields.String(validate=OneOf(["histogram_aggregate"]))
     metric = fields.Nested(HistogrammableMetrics, required=True)
-    range = fields.Nested(Bounds)
-    bins = fields.Nested(HistogramBins)
+    range = fields.List(fields.Float, validate=Length(equal=2))
+    bins = fields.Nested(HistogramBins, required=True)
 
     @post_load
     def make_query_object(self, params, **kwargs):
