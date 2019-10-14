@@ -10,6 +10,7 @@ from flowmachine.core.server.query_schemas.joined_spatial_aggregate import (
 from flowmachine.core.server.query_schemas.spatial_aggregate import (
     SpatialAggregateSchema,
 )
+from .histogram_aggregate import HistogramAggregateSchema
 from .dummy_query import DummyQuerySchema
 from .flows import FlowsSchema
 from .meaningful_locations import (
@@ -45,4 +46,5 @@ class FlowmachineQuerySchema(OneOfSchema):
         "dfs_metric_total_amount": DFSTotalMetricAmountSchema,
         "spatial_aggregate": SpatialAggregateSchema,
         "joined_spatial_aggregate": JoinedSpatialAggregateSchema,
+        "histogram_aggregate": HistogramAggregateSchema,
     }
