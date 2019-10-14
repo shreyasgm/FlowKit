@@ -151,7 +151,7 @@ def get_spatial_aggregate_kind_and_claims(query_json):
 def get_joined_spatial_aggregate_kind_and_claims(query_json):
     location_spec = get_spatial_aggregate_kind_and_claims(query_json)
     try:
-        wrapped_metric = query_json["metric"]
+        wrapped_metric = dict(query_json["metric"])
         # Some metrics don't have an aggregation unit
         if "aggregation_unit" not in wrapped_metric:
             wrapped_metric["aggregation_unit"] = query_json["locations"][

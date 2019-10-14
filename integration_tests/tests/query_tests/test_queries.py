@@ -4,9 +4,8 @@
 
 
 import pytest
-from flowclient.client import get_result
-
 import flowclient
+from flowclient.client import get_result
 
 from flowkit_jwt_generator import permissions_types, spatial_aggregation_types
 
@@ -579,6 +578,34 @@ from flowkit_jwt_generator import permissions_types, spatial_aggregation_types
                     estimate_count=False,
                     seed=0.2,
                 )
+            },
+        ),
+        (
+            "histogram_aggregate",
+            {
+                "bins": 5,
+                "metric": flowclient.topup_balance(
+                    start_date="2016-01-01", end_date="2016-01-02", statistic="avg"
+                ),
+            },
+        ),
+        (
+            "histogram_aggregate",
+            {
+                "bins": [0, 100, 1000, 10000],
+                "metric": flowclient.topup_balance(
+                    start_date="2016-01-01", end_date="2016-01-02", statistic="avg"
+                ),
+            },
+        ),
+        (
+            "histogram_aggregate",
+            {
+                "bins": [0, 100, 1000, 10000],
+                "metric": flowclient.topup_balance(
+                    start_date="2016-01-01", end_date="2016-01-02", statistic="avg"
+                ),
+                "range": [0, 500],
             },
         ),
     ],
