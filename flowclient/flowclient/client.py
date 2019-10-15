@@ -1222,7 +1222,7 @@ def histogram_aggregate(
         bins = dict(bin_list=bins)
     else:
         bins = dict(n_bin=bins)
-    spec = dict(query_kind=histogram_aggregate, metric=metric, bins=bins)
+    spec = dict(query_kind="histogram_aggregate", metric=metric, bins=bins)
     if range is not None:
         spec["range"] = dict(lower_bound=range[0], upper_bound=range[1])
     return spec
