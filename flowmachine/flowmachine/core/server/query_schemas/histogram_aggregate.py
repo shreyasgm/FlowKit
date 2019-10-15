@@ -89,7 +89,7 @@ class HistogramAggregateExposed(BaseExposedQuery):
         # so that marshmallow can serialise the object correctly.
         self.metric = metric
         self.bins = bins
-        self.range = range
+        self.range = range if range is None else tuple(range)
 
     @property
     def _flowmachine_query_obj(self):
