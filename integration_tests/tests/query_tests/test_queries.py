@@ -687,7 +687,7 @@ def test_get_geography(access_token_builder, flowapi_url):
             {
                 "geography": {
                     "permissions": permissions_types,
-                    "spatial_aggregation": aggregation_types,
+                    "spatial_aggregation": spatial_aggregation_types,
                 }
             }
         ),
