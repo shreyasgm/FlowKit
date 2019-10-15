@@ -68,7 +68,7 @@ class HistogramBins(Schema):
 
     @post_load
     def to_value(self, params, **kwargs):
-        return params.get("n_bins", params["bin_list"])
+        return params.get("n_bins", params.get("bin_list"))
 
 
 class HistogramAggregateSchema(Schema):
