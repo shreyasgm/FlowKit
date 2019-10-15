@@ -52,14 +52,14 @@ def dummy_flowapi(monkeypatch):
             "permissions": {"get_result": True, "poll": True, "run": True},
             "aggregations": {
                 "spatial_aggregation": ["admin0", "admin1", "admin2", "admin3"],
-                "histogram_aggregation": True,
+                "histogram_aggregate": True,
             },
         },
         "DUMMY_QUERY_WITH_NO_AGGREGATIONS_KIND": {
             "permissions": {"get_result": True, "poll": True, "run": True},
             "aggregations": {
                 "spatial_aggregation": ["admin0", "admin1", "admin2", "admin3"],
-                "histogram_aggregation": True,
+                "histogram_aggregate": True,
             },
         },
         "available_dates": {"permissions": {"get_result": True}},

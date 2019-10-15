@@ -195,7 +195,7 @@ def get_all_claims_from_flowapi(
         dict(
             permissions=permissions_types,
             aggregations=dict(
-                spatial_aggregation=aggregation_types, histogram_aggregation=True
+                spatial_aggregation=aggregation_types, histogram_aggregate=True
             ),
         ),
     )
@@ -303,7 +303,7 @@ def named_query(query_name, permission, spatial_aggregation, histogram_aggregati
             permissions={p: True for p in permission},
             aggregations=dict(
                 spatial_aggregation=spatial_aggregation,
-                histogram_aggregation=histogram_aggregation,
+                histogram_aggregate=histogram_aggregation,
             ),
         )
     }

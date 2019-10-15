@@ -84,13 +84,13 @@ def test_token_builder(private_key_bytes, public_key):
     assert decoded["identity"] == "DUMMY_USER"
     assert decoded["user_claims"]["DUMMY_QUERY"] == {
         "permissions": {"run": True, "poll": True},
-        "aggregations": {"spatial_aggregation": [], "histogram_aggregation": False},
+        "aggregations": {"spatial_aggregation": [], "histogram_aggregate": False},
     }
     assert decoded["user_claims"]["DUMMY_QUERY_B"] == {
         "permissions": {},
         "aggregations": {
             "spatial_aggregation": ["admin3", "admin0"],
-            "histogram_aggregation": True,
+            "histogram_aggregate": True,
         },
     }
 
