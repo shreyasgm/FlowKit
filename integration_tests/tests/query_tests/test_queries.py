@@ -684,12 +684,12 @@ def test_get_geography(access_token_builder, flowapi_url):
     con = flowclient.Connection(
         url=flowapi_url,
         token=access_token_builder(
-            {
-                "geography": {
-                    "permissions": permissions_types,
-                    "spatial_aggregation": spatial_aggregation_types,
-                }
-            }
+            dict(
+                geography=dict(
+                    permissions=permissions_types,
+                    aggregations=dict(spatial_aggregation=spatial_aggregation_types),
+                )
+            )
         ),
     )
     result_geojson = flowclient.get_geography(connection=con, aggregation_unit="admin3")
@@ -774,7 +774,7 @@ def test_get_available_dates(
     con = flowclient.Connection(
         url=flowapi_url,
         token=access_token_builder(
-            {"available_dates": {"permissions": {"get_result": True}}}
+            dict(available_dates=dict(permissions=dict(get_result=True)))
         ),
     )
     result = flowclient.get_available_dates(connection=con, event_types=event_types)
