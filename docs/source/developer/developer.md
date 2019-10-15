@@ -159,11 +159,16 @@ At present, the following query types are accessible through FlowAPI:
 
     Return statistics of a subscribers displacement from
     their reference location.
+    
 - `pareto_interactions`
 
     Returns two columns: `subscriber`, `pareto` - where the latter is the
     proportion of that subscriber's contacts who account for the requested
     proportion (0.8, by default) of their interactions in this time period.
+
+- `histogram_aggregate`
+    
+    Calculates a histogram over another metric.
 
 ### FlowAPI Access tokens
 
