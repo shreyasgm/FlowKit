@@ -94,7 +94,9 @@ def fill_config_default_values(global_config_dict: dict) -> dict:
     """
     global_config_dict = deepcopy(global_config_dict)
     sense_conf = global_config_dict.setdefault("sensor", {})
-    sense_conf.setdefault("schedule", "@daily")
+    sense_conf.setdefault("schedule", None)
+    if sense_conf["schedule"] == "None":
+        sense_conf["schedule"] = None
 
     for cdr_type, value in global_config_dict["etl"].items():
         if (
