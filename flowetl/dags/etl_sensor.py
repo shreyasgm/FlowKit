@@ -42,4 +42,4 @@ if flowetl_runtime_config == "production":
     )
 else:
     logger.info(f"Running in {flowetl_runtime_config} environment")
-    dag = construct_etl_sensor_dag(callable=etl_sensor_task_callable)
+    dag = construct_etl_sensor_dag(callable=etl_sensor_task_callable, schedule=None)
