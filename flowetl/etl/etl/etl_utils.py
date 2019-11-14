@@ -6,11 +6,12 @@
 """
 Contains utility functions for use in the ETL dag and it's callables
 """
+import datetime
 import os
 import pendulum
 import re
 
-from typing import List, Callable
+from typing import List, Callable, Optional, Union
 from enum import Enum
 from pathlib import Path
 
@@ -22,7 +23,9 @@ from airflow.hooks.postgres_hook import PostgresHook
 from airflow.operators.python_operator import PythonOperator
 
 
-def construct_etl_sensor_dag(*, callable: Callable) -> DAG:
+def construct_etl_sensor_dag(
+    *, callable: Callable, schedule: Optional[Union[str, datetime.timedelta]] = "@daily"
+) -> DAG:
     """
     This function constructs the sensor single task DAG that triggers ETL
     DAGS with correct config based on filename.
@@ -32,6 +35,9 @@ def construct_etl_sensor_dag(*, callable: Callable) -> DAG:
     callable : Callable
         The sense callable that deals with finding files and triggering
         ETL DAGs
+    schedule : str, None, or datetime.timedelta, default "@daily"
+        None for manually triggered, cron expression as string, timedelta,
+         or one of the Airflow cron presets: @daily, @hourly, @weekly, @monthly, @yearly.
 
     Returns
     -------
@@ -45,7 +51,8 @@ def construct_etl_sensor_dag(*, callable: Callable) -> DAG:
     with DAG(
         dag_id=f"etl_sensor",
         start_date=pendulum.parse("1900-01-01"),
-        schedule_interval=None,
+        catchup=False,
+        schedule_interval=schedule,
         default_args=default_args,
     ) as dag:
         sense = PythonOperator(

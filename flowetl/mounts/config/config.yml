@@ -1,5 +1,7 @@
 # This is an example flowetl config file which
 # is also used in the flowetl unit tests.
+sensor:
+  sense_schedule: "@daily"
 etl:
   calls:
     concurrency: 4
