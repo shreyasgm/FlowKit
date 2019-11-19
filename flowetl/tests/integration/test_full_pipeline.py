@@ -94,7 +94,7 @@ def test_single_file_previously_quarantined(
         "TOPUPS_20160101.csv.gz",
     ]  # all files
 
-    files = [file.name for file in Path(str(tmpdir) / "files").glob("*")]
+    files = [file.name for file in Path(str(tmpdir / "files")).glob("*")]
 
     assert set(all_files) == (set(files) - set(["README.md"]))
 
@@ -191,3 +191,18 @@ def test_single_file_previously_quarantined(
     etl_states = get_etl_states(cdr_type="topups", cdr_date="2016-01-01")
     etl_states_expected = ["archive", "ingest"]
     assert etl_states_expected == etl_states
+
+
+def test_incremental_arrival(
+    flowetl_container,
+    write_files_to_files,
+    trigger_dags,
+    wait_for_completion,
+    flowetl_db_session,
+    flowdb_session,
+    flowdb_connection,
+):
+    """
+    Test loading from an incrementally filling foreign data wrapper.
+    """
+    pass

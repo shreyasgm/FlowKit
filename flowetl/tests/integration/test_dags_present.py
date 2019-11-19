@@ -9,13 +9,13 @@ Make sure that airflow is able to pick up the correct DAGs
 
 import pytest
 
-from airflow.models import DagBag
-
 # pylint: disable=unused-argument
 def test_dags_present(airflow_local_setup, tmpdir):
     """
     Test that the correct dags are parsed
     """
+    from airflow.models import DagBag
+
     assert set(
         DagBag(dag_folder=str(tmpdir / "dags"), include_examples=False).dag_ids
     ) == set(["etl_testing", "etl_sensor"])
@@ -46,5 +46,7 @@ def test_correct_tasks(airflow_local_setup, dag_name, expected_task_list, tmpdir
     """
     Test that each dag has the tasks expected
     """
+    from airflow.models import DagBag
+
     dag = DagBag(dag_folder=str(tmpdir / "dags"), include_examples=False).dags[dag_name]
     assert set(dag.task_ids) == set(expected_task_list)
