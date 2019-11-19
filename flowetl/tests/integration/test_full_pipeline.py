@@ -1,6 +1,5 @@
-import os
-
 from pathlib import Path
+
 from pendulum import parse
 
 from etl.model import ETLRecord
@@ -14,6 +13,7 @@ def test_single_file_previously_quarantined(
     flowetl_db_session,
     flowdb_session,
     flowdb_connection,
+    tmpdir,
 ):
     """
     Test for full pipeline. We want to test the following things;
@@ -94,7 +94,7 @@ def test_single_file_previously_quarantined(
         "TOPUPS_20160101.csv.gz",
     ]  # all files
 
-    files = [file.name for file in Path(f"{os.getcwd()}/mounts/files").glob("*")]
+    files = [file.name for file in Path(str(tmpdir) / "files").glob("*")]
 
     assert set(all_files) == (set(files) - set(["README.md"]))
 

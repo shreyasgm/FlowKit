@@ -621,7 +621,6 @@ jobs:
     machine:
       image: ubuntu-1604:201903-01
     environment:
-      AIRFLOW_HOME: ./test_airflow_home
       FLOWETL_RUNTIME_CONFIG: "testing"
     working_directory: /home/circleci/project/flowetl
     steps:

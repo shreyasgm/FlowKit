@@ -353,11 +353,11 @@ def write_files_to_files(tmpdir):
     of empty files to the files location. Also cleans
     up the files location.
     """
-    files_dir = f"{tmpdir}/files"
+    files_dir = tmpdir / "files"
 
     def write_files_to_files_function(*, file_names):
         for file_name in file_names:
-            Path(f"{files_dir}/{file_name}").touch()
+            Path(files_dir / file_name).touch()
 
     yield write_files_to_files_function
 
@@ -557,7 +557,7 @@ def flowetl_db_connection_engine(container_env, container_ports):
     """
     Engine for flowetl_db
     """
-    conn_str = f"psycopg2+postgresql://{container_env['flowetl_db']['POSTGRES_USER']}:{container_env['flowetl_db']['POSTGRES_PASSWORD']}@localhost:{container_ports['flowetl_db']}/{container_env['flowetl_db']['POSTGRES_DB']}"
+    conn_str = f"postgresql://{container_env['flowetl_db']['POSTGRES_USER']}:{container_env['flowetl_db']['POSTGRES_PASSWORD']}@localhost:{container_ports['flowetl_db']}/{container_env['flowetl_db']['POSTGRES_DB']}"
     logger.info(conn_str)
     engine = create_engine(conn_str)
 
