@@ -9,8 +9,6 @@ Test dag run logic
 
 import pytest
 
-from airflow.models import DagRun
-
 
 @pytest.mark.parametrize(
     "task_to_fail,expected_task_states",
@@ -75,12 +73,17 @@ from airflow.models import DagRun
     ],
 )
 def test_quarantine_branch(
-    airflow_local_pipeline_run, wait_for_completion, task_to_fail, expected_task_states
+    airflow_local_pipeline_run,
+    wait_for_completion,
+    task_to_fail,
+    expected_task_states,
+    dagrun_find,
 ):
     """
     Tests that correct tasks run, with correct end state, when ETL is
     not successful. We fail each of the tasks init, extract, transform and load.
     """
+
     end_state = "failed"
     fail_state = "success"
     dag_type = "testing"
@@ -91,7 +94,7 @@ def test_quarantine_branch(
     )
     assert final_etl_state == end_state
 
-    etl_dag = DagRun.find(f"etl_{dag_type}", state=end_state)[0]
+    etl_dag = dagrun_find(f"etl_{dag_type}", state=end_state)[0]
 
     task_states = {task.task_id: task.state for task in etl_dag.get_task_instances()}
     assert task_states == expected_task_states

@@ -17,24 +17,19 @@ from pathlib import Path
 from time import sleep
 from subprocess import DEVNULL, Popen
 from pendulum import now, Interval
-from airflow.models import DagRun
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from docker.types import Mount
-from shutil import rmtree
 from requests.exceptions import RequestException
 
 here = os.path.dirname(os.path.abspath(__file__))
 logger = structlog.get_logger("flowetl-tests")
 
 
-@pytest.fixture(scope="session", autouse=True)
-def ensure_required_env_vars_are_set():
-    if "AIRFLOW_HOME" not in os.environ:
-        raise RuntimeError(
-            "Must set environment variable AIRFLOW_HOME to run the flowetl tests."
-        )
-
+@pytest.fixture(autouse=True)
+def ensure_required_env_vars_are_set(monkeypatch, tmpdir):
+    monkeypatch.setenv("AIRFLOW_HOME", tmpdir)
+    monkeypatch.setenv("FLOWETL_RUNTIME_CONFIG", "testing")
     if "testing" != os.getenv("FLOWETL_RUNTIME_CONFIG", "").lower():
         raise RuntimeError(
             "Must set environment variable FLOWETL_RUNTIME_CONFIG='testing' to run the flowetl tests."
@@ -47,12 +42,12 @@ def ensure_required_env_vars_are_set():
         )
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def flowetl_mounts_dir():
     return os.path.abspath(os.path.join(here, "..", "..", "mounts"))
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def docker_client():
     """
     docker client object - used to run containers
@@ -60,7 +55,7 @@ def docker_client():
     return docker.from_env()
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def docker_api_client():
     """
     docker APIClient object - needed to inspect containers
@@ -68,7 +63,7 @@ def docker_api_client():
     return docker.APIClient()
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def container_tag():
     """
     Get tag to use for containers
@@ -76,7 +71,7 @@ def container_tag():
     return os.environ["FLOWETL_TESTS_CONTAINER_TAG"]
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def container_env():
     """
     Environments for each container
@@ -112,7 +107,7 @@ def container_env():
     return {"flowetl": flowetl, "flowdb": flowdb, "flowetl_db": flowetl_db}
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def container_ports():
     """
     Exposed ports for flowetl_db and flowdb (
@@ -128,7 +123,7 @@ def container_ports():
     }
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 def container_network(docker_client):
     """
     A docker network for containers to communicate on
@@ -138,39 +133,37 @@ def container_network(docker_client):
     network.remove()
 
 
-@pytest.fixture(scope="function")
-def postgres_data_dir_for_tests():
+@pytest.fixture
+def postgres_data_dir_for_tests(tmpdir):
     """
     Creates and cleans up a directory for storing pg data.
     Used by Flowdb because on unix changing flowdb user is
     incompatible with using a volume for the DB's data.
     """
-    path = f"{os.getcwd()}/pg_data"
-    if not os.path.exists(path):
-        os.makedirs(path)
+    path = f"{tmpdir}/pg_data"
     yield path
-    rmtree(path)
 
 
-@pytest.fixture(scope="function")
-def mounts(postgres_data_dir_for_tests, flowetl_mounts_dir):
+@pytest.fixture
+def mounts(postgres_data_dir_for_tests, flowetl_mounts_dir, tmpdir):
     """
     Various mount objects needed by containers
     """
-    config_mount = Mount("/mounts/config", f"{flowetl_mounts_dir}/config", type="bind")
-    files_mount = Mount("/mounts/files", f"{flowetl_mounts_dir}/files", type="bind")
+    shutil.copytree(flowetl_mounts_dir, tmpdir)
+    config_mount = Mount("/mounts/config", f"{tmpdir}/config", type="bind")
+    files_mount = Mount("/mounts/files", f"{tmpdir}/files", type="bind")
     flowetl_mounts = [config_mount, files_mount]
 
     data_mount = Mount(
         "/var/lib/postgresql/data", postgres_data_dir_for_tests, type="bind"
     )
-    files_mount = Mount("/files", f"{flowetl_mounts_dir}/files", type="bind")
+    files_mount = Mount("/files", f"{tmpdir}/files", type="bind")
     flowdb_mounts = [data_mount, files_mount]
 
     return {"flowetl": flowetl_mounts, "flowdb": flowdb_mounts}
 
 
-@pytest.fixture(scope="session", autouse=True)
+@pytest.fixture
 def pull_docker_images(docker_client, container_tag):
     disable_pulling_docker_images = (
         os.getenv(
@@ -191,7 +184,7 @@ def pull_docker_images(docker_client, container_tag):
         logger.info("Done pulling docker images.")
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 def flowdb_container(
     docker_client,
     docker_api_client,
@@ -248,7 +241,7 @@ def flowdb_container(
     container.remove()
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 def flowetl_db_container(
     docker_client, container_env, container_ports, container_network
 ):
@@ -268,7 +261,7 @@ def flowetl_db_container(
     container.remove()
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 def flowetl_container(
     flowdb_container,
     flowetl_db_container,
@@ -332,7 +325,7 @@ def flowetl_container(
     container.remove()
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 def trigger_dags():
     """
     Returns a function that unpauses all DAGs and then triggers
@@ -351,14 +344,14 @@ def trigger_dags():
     return trigger_dags_function
 
 
-@pytest.fixture(scope="function")
-def write_files_to_files(flowetl_mounts_dir):
+@pytest.fixture
+def write_files_to_files(tmpdir):
     """
     Returns a function that allows for writing a list
     of empty files to the files location. Also cleans
     up the files location.
     """
-    files_dir = f"{flowetl_mounts_dir}/files"
+    files_dir = f"{tmpdir}/files"
 
     def write_files_to_files_function(*, file_names):
         for file_name in file_names:
@@ -372,8 +365,8 @@ def write_files_to_files(flowetl_mounts_dir):
     [file.unlink() for file in files_to_remove]
 
 
-@pytest.fixture(scope="module")
-def airflow_local_setup():
+@pytest.fixture
+def airflow_local_setup(tmpdir):
     """
     Init the airflow sqlitedb and start the scheduler with minimal env.
     Clean up afterwards by removing the AIRFLOW_HOME and stopping the
@@ -381,14 +374,15 @@ def airflow_local_setup():
     test invocation otherwise it gets created somewhere else.
     """
     extra_env = {
-        "AIRFLOW__CORE__DAGS_FOLDER": "./dags",
+        "AIRFLOW__CORE__DAGS_FOLDER": tmpdir / "dags",
         "AIRFLOW__CORE__LOAD_EXAMPLES": "false",
+        "AIRFLOW_HOME": tmpdir,
     }
     env = {**os.environ, **extra_env}
-    # make test Airflow home dir
-    airflow_home_dir_for_tests = os.environ["AIRFLOW_HOME"]
-    if not os.path.exists(airflow_home_dir_for_tests):
-        os.makedirs(airflow_home_dir_for_tests)
+    dags = (Path(__file__).parent.parent.parent / "dags").glob("*.py")
+    (tmpdir / "dags").mkdir()
+    for dag_file in dags:
+        shutil.copy2(dag_file, tmpdir / "dags")
 
     initdb = Popen(
         ["airflow", "initdb"], shell=False, stdout=DEVNULL, stderr=DEVNULL, env=env
@@ -406,40 +400,35 @@ def airflow_local_setup():
 
     scheduler.terminate()
 
-    shutil.rmtree(airflow_home_dir_for_tests)
-    os.unlink("./scheduler.log")
 
-
-@pytest.fixture(scope="function")
-def airflow_local_pipeline_run():
+@pytest.fixture
+def airflow_local_pipeline_run(tmpdir):
     """
     As in `airflow_local_setup` but starts the scheduler with some extra env
     determined in the test. Also triggers the etl_sensor dag causing a
     subsequent trigger of the etl dag.
     """
     scheduler_to_clean_up = None
-    airflow_home_dir_for_tests = None
 
     def run_func(extra_env):
         nonlocal scheduler_to_clean_up
-        nonlocal airflow_home_dir_for_tests
         default_env = {
-            "AIRFLOW__CORE__DAGS_FOLDER": "./dags",
+            "AIRFLOW__CORE__DAGS_FOLDER": (tmpdir / "dags"),
             "AIRFLOW__CORE__LOAD_EXAMPLES": "false",
+            "AIRFLOW_HOME": tmpdir,
         }
         env = {**os.environ, **default_env, **extra_env}
-
-        # make test Airflow home dir
-        airflow_home_dir_for_tests = os.environ["AIRFLOW_HOME"]
-        if not os.path.exists(airflow_home_dir_for_tests):
-            os.makedirs(airflow_home_dir_for_tests)
+        dags = (Path(__file__).parent.parent.parent / "dags").glob("*.py")
+        (tmpdir / "dags").mkdir()
+        for dag_file in dags:
+            shutil.copy2(dag_file, tmpdir / "dags")
 
         initdb = Popen(
             ["airflow", "initdb"], shell=False, stdout=DEVNULL, stderr=DEVNULL, env=env
         )
         initdb.wait()
 
-        with open("scheduler.log", "w") as fout:
+        with open(tmpdir / "scheduler.log", "w") as fout:
             scheduler = Popen(
                 ["airflow", "scheduler"], shell=False, stdout=fout, stderr=fout, env=env
             )
@@ -478,12 +467,20 @@ def airflow_local_pipeline_run():
 
     scheduler_to_clean_up.terminate()
 
-    shutil.rmtree(airflow_home_dir_for_tests)
-    os.unlink("./scheduler.log")
+
+@pytest.fixture
+def dagrun_find(ensure_required_env_vars_are_set):
+    """
+    Fixture which provides Airflow'd dagrun.find function but ensures that
+    airflow is imported locally so that it respects any env vars.
+    """
+    from airflow.models import DagRun
+
+    yield DagRun.find
 
 
-@pytest.fixture(scope="function")
-def wait_for_completion():
+@pytest.fixture
+def wait_for_completion(dagrun_find):
     """
     Return a function that waits for the etl dag to be in a specific
     end state. If dag does not reach this state within (arbitrarily but
@@ -505,10 +502,12 @@ def wait_for_completion():
 
         t0 = now()
         reached_end_state = False
-        while len(DagRun.find(**kwargs_expected)) != 1:
+
+        while len(dagrun_find(**kwargs_expected)) != 1:
+            current = dagrun_find(dag_id=kwargs_expected["dag_id"])
             sleep(1)
             t1 = now()
-            if (t1 - t0) > time_out or len(DagRun.find(**kwargs_fail)) == 1:
+            if (t1 - t0) > time_out or len(dagrun_find(**kwargs_fail)) == 1:
                 raise TimeoutError(
                     f"DAG '{dag_id}' did not reach desired state {end_state}. This may be "
                     "due to missing config settings, syntax errors in one of its task, or "
@@ -519,7 +518,7 @@ def wait_for_completion():
     return wait_func
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 def flowdb_connection_engine(container_env, container_ports):
     """
     Engine for flowdb
@@ -530,7 +529,7 @@ def flowdb_connection_engine(container_env, container_ports):
     return engine
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 def flowdb_connection(flowdb_connection_engine):
     """
     Connection for flowdb - allowing for execution of
@@ -542,7 +541,7 @@ def flowdb_connection(flowdb_connection_engine):
     connection.close()
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 def flowdb_session(flowdb_connection_engine):
     """
     sqlalchemy session for flowdb - used for ORM models
@@ -552,7 +551,7 @@ def flowdb_session(flowdb_connection_engine):
     session.close()
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 def flowetl_db_connection_engine(container_env, container_ports):
     """
     Engine for flowetl_db
@@ -564,7 +563,7 @@ def flowetl_db_connection_engine(container_env, container_ports):
     return engine
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 def flowetl_db_session(flowetl_db_connection_engine):
     """
     sqlalchemy session for flowetl - used for ORM models

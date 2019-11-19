@@ -12,13 +12,13 @@ import pytest
 from airflow.models import DagBag
 
 # pylint: disable=unused-argument
-def test_dags_present(airflow_local_setup):
+def test_dags_present(airflow_local_setup, tmpdir):
     """
     Test that the correct dags are parsed
     """
-    assert set(DagBag(dag_folder="./dags", include_examples=False).dag_ids) == set(
-        ["etl_testing", "etl_sensor"]
-    )
+    assert set(
+        DagBag(dag_folder=str(tmpdir / "dags"), include_examples=False).dag_ids
+    ) == set(["etl_testing", "etl_sensor"])
 
 
 @pytest.mark.parametrize(
@@ -42,9 +42,9 @@ def test_dags_present(airflow_local_setup):
         ("etl_sensor", ["sense"]),
     ],
 )
-def test_correct_tasks(airflow_local_setup, dag_name, expected_task_list):
+def test_correct_tasks(airflow_local_setup, dag_name, expected_task_list, tmpdir):
     """
     Test that each dag has the tasks expected
     """
-    dag = DagBag(dag_folder="./dags", include_examples=False).dags[dag_name]
+    dag = DagBag(dag_folder=str(tmpdir / "dags"), include_examples=False).dags[dag_name]
     assert set(dag.task_ids) == set(expected_task_list)
