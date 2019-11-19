@@ -44,7 +44,7 @@ def ensure_required_env_vars_are_set(monkeypatch, tmpdir):
 
 @pytest.fixture
 def flowetl_mounts_dir():
-    return os.path.abspath(os.path.join(here, "..", "..", "mounts"))
+    return Path(__file__).parent.parent.parent / "mounts"
 
 
 @pytest.fixture
@@ -140,7 +140,8 @@ def postgres_data_dir_for_tests(tmpdir):
     Used by Flowdb because on unix changing flowdb user is
     incompatible with using a volume for the DB's data.
     """
-    path = f"{tmpdir}/pg_data"
+    path = tmpdir / "pg_data"
+    path.mkdir()
     yield path
 
 
@@ -149,13 +150,14 @@ def mounts(postgres_data_dir_for_tests, flowetl_mounts_dir, tmpdir):
     """
     Various mount objects needed by containers
     """
-    shutil.copytree(flowetl_mounts_dir, tmpdir)
+    shutil.copytree(flowetl_mounts_dir / "config", tmpdir / "config")
+    shutil.copytree(flowetl_mounts_dir / "files", tmpdir / "files")
     config_mount = Mount("/mounts/config", f"{tmpdir}/config", type="bind")
     files_mount = Mount("/mounts/files", f"{tmpdir}/files", type="bind")
     flowetl_mounts = [config_mount, files_mount]
 
     data_mount = Mount(
-        "/var/lib/postgresql/data", postgres_data_dir_for_tests, type="bind"
+        "/var/lib/postgresql/data", str(postgres_data_dir_for_tests), type="bind"
     )
     files_mount = Mount("/files", f"{tmpdir}/files", type="bind")
     flowdb_mounts = [data_mount, files_mount]
@@ -186,6 +188,7 @@ def pull_docker_images(docker_client, container_tag):
 
 @pytest.fixture
 def flowdb_container(
+    request,
     docker_client,
     docker_api_client,
     container_tag,
@@ -206,6 +209,7 @@ def flowdb_container(
         environment=container_env["flowdb"],
         ports={"5432": container_ports["flowdb"]},
         name="flowdb",
+        auto_remove=True,
         network="testing",
         mounts=mounts["flowdb"],
         healthcheck={"test": "pg_isready -h localhost -U flowdb"},
@@ -237,8 +241,7 @@ def flowdb_container(
     )
 
     yield
-    container.kill()
-    container.remove()
+    container.stop()
 
 
 @pytest.fixture
@@ -255,10 +258,10 @@ def flowetl_db_container(
         name="flowetl_db",
         network="testing",
         detach=True,
+        auto_remove=True,
     )
     yield
-    container.kill()
-    container.remove()
+    container.stop()
 
 
 @pytest.fixture
@@ -313,16 +316,15 @@ def flowetl_container(
         environment=container_env["flowetl"],
         name="flowetl",
         network="testing",
-        restart_policy={"Name": "always"},
         ports={"8080": container_ports["flowetl_airflow"]},
         mounts=mounts["flowetl"],
         user=user,
+        auto_remove=True,
         detach=True,
     )
     wait_for_container()
     yield container
-    container.kill()
-    container.remove()
+    container.stop()
 
 
 @pytest.fixture
@@ -504,7 +506,6 @@ def wait_for_completion(dagrun_find):
         reached_end_state = False
 
         while len(dagrun_find(**kwargs_expected)) != 1:
-            current = dagrun_find(dag_id=kwargs_expected["dag_id"])
             sleep(1)
             t1 = now()
             if (t1 - t0) > time_out or len(dagrun_find(**kwargs_fail)) == 1:
@@ -556,7 +557,7 @@ def flowetl_db_connection_engine(container_env, container_ports):
     """
     Engine for flowetl_db
     """
-    conn_str = f"postgresql://{container_env['flowetl_db']['POSTGRES_USER']}:{container_env['flowetl_db']['POSTGRES_PASSWORD']}@localhost:{container_ports['flowetl_db']}/{container_env['flowetl_db']['POSTGRES_DB']}"
+    conn_str = f"psycopg2+postgresql://{container_env['flowetl_db']['POSTGRES_USER']}:{container_env['flowetl_db']['POSTGRES_PASSWORD']}@localhost:{container_ports['flowetl_db']}/{container_env['flowetl_db']['POSTGRES_DB']}"
     logger.info(conn_str)
     engine = create_engine(conn_str)
 
