@@ -9,7 +9,7 @@ RUN npm install --production
 RUN PUBLIC_URL=/static npm run-script build
 
 
-FROM tiangolo/uwsgi-nginx-flask:python3.7-alpine3.8@sha256:8db3d188478439edce792e55f5e3d3417469dd5fe4387105b840475808254956
+FROM tiangolo/uwsgi-nginx-flask:python3.7-alpine3.8@sha256:f0839c354fb9c9e57e259e361e77339a7afd990c176eb8860d705d46cb809ee4
 COPY Pipfile .
 COPY Pipfile.lock .
 # Install dependencies required for argon crypto & psycopg2
