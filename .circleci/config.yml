@@ -112,6 +112,8 @@ executors:
     docker:
       - image: circleci/python:3.7
       - image: flowminder/flowdb-<<parameters.flowdb_image>>:$CIRCLE_SHA1
+        command:
+          - "fsync=off"
         environment:
           N_DAYS: <<parameters.num_days>>
           DISASTER_START: <<parameters.disaster_start_date>>
@@ -212,6 +214,7 @@ jobs:
               --volume=${FLOWDB_INGESTION_DIR}:/ingestion:ro -e FLOWMACHINE_FLOWDB_PASSWORD=foo -e FLOWAPI_FLOWDB_PASSWORD=foo \
               -e MAX_CPUS=2 -e MAX_WORKERS=2 -e MAX_WORKERS_PER_GATHER=2 \
               -e POSTGRES_PASSWORD=$POSTGRES_PASSWORD \
+              -c fsync=off \
               --detach flowminder/flowdb:$SAFE_TAG
 
             echo "Waiting for flowdb to be ready.."
@@ -271,7 +274,7 @@ jobs:
           name: Launch flowdb
           command: |
             docker run --name flowdb_oracle --shm-size=1G --publish $ORACLE_DB_PORT:5432 -e FLOWMACHINE_FLOWDB_PASSWORD=foo -e FLOWAPI_FLOWDB_PASSWORD=foo \
-            -e POSTGRES_PASSWORD=$POSTGRES_PASSWORD \
+            -e POSTGRES_PASSWORD=$POSTGRES_PASSWORD -c fsync=off \
              --detach flowminder/flowdb:oracle-$CIRCLE_SHA1
             echo "Waiting for flowdb with oracle_fdw to be ready.."
             docker exec flowdb_oracle bash -c 'i=0;until [ $i -ge 24 ] || (pg_isready -h 127.0.0.1 -p 5432);do let i=i+1; echo Waiting 10s; sleep 10;done'
