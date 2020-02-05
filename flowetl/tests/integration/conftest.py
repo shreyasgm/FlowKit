@@ -232,7 +232,7 @@ def flowdb_container(
         environment=container_env["flowdb"],
         ports={"5432": container_ports["flowdb"]},
         name=f"flowdb_{container_name_suffix}",
-        command=["fsync=off"],
+        command=["-c", "fsync=off"],
         mounts=mounts["flowdb"],
         healthcheck={
             "test": "pg_isready -h localhost -U flowdb",
@@ -281,7 +281,7 @@ def flowetl_db_container(
     logger.info("Starting FlowETL db container")
     container = docker_client.containers.run(
         f"postgres:11.0",
-        command=["fsync=off"],
+        command=["-c", "fsync=off"],
         environment=container_env["flowetl_db"],
         ports={"5432": container_ports["flowetl_db"]},
         name=f"flowetl_db_{container_name_suffix}",
