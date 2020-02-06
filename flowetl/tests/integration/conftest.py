@@ -232,7 +232,14 @@ def flowdb_container(
         environment=container_env["flowdb"],
         ports={"5432": container_ports["flowdb"]},
         name=f"flowdb_{container_name_suffix}",
-        command=["-c", "fsync=off"],
+        command=[
+            "-c",
+            "wal_level=minimal",
+            "-c",
+            "max_wal_senders=0",
+            "-c",
+            "fsync=off",
+        ],
         mounts=mounts["flowdb"],
         healthcheck={
             "test": "pg_isready -h localhost -U flowdb",
