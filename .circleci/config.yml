@@ -112,7 +112,11 @@ executors:
     docker:
       - image: circleci/python:3.7
       - image: flowminder/flowdb-<<parameters.flowdb_image>>:$CIRCLE_SHA1
-        command:
+        command: # Turning off fsync, but still want to use the default command sequence
+          - "-c"
+          - "wal_level='minimal'"
+          - "-c"
+          - "max_wal_senders=0"
           - "-c"
           - "fsync=off"
         environment:
