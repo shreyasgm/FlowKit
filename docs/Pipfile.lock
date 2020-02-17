@@ -653,10 +653,10 @@
         },
         "mknotebooks": {
             "hashes": [
-                "sha256:c88bfd4a65edc782577b5d07e9312fde61314e6ac6bc5fdc01d614c192c818e9"
+                "sha256:cb139c2835085d394e49f30fde4bf5a68e0c7e795b375386a7cb686268068890"
             ],
             "index": "pypi",
-            "version": "==0.1.8"
+            "version": "==0.1.10"
         },
         "mktheapidocs": {
             "hashes": [
