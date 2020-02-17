@@ -4,9 +4,9 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+black = "==19.10b0" # required by papermill
 pytest = "*"
 pytest-asyncio = "*"
-black = "==19.10b0"
 flowmachine = {editable = true,path = "./../flowmachine"}
 flowclient = {editable = true,path = "./../flowclient"}
 flowapi = {editable = true,path = "./../flowapi"}
