@@ -59,7 +59,7 @@
                 "sha256:5b26757dc6f79a3b7dc9fab95359328d5747fcb2409d331ea66d0272b90ab2a0",
                 "sha256:8b995ffe925347a2138d7ac0fe77155e4311a0ea6d6da4f5128fe4b3cbe5ed71"
             ],
-            "markers": "sys_platform == 'darwin'",
+            "markers": "platform_system == 'Darwin'",
             "version": "==0.1.0"
         },
         "asyncpg": {
@@ -653,10 +653,10 @@
         },
         "mknotebooks": {
             "hashes": [
-                "sha256:b08fe8bd75f082249220306742df1fcdfe210d201cda8e32e9d1c19febf6fe7b"
+                "sha256:27efb5f5fe5bced1585a1056321febeee4d1b4e701c5b25c99460b157f96b0c0"
             ],
             "index": "pypi",
-            "version": "==0.1.15"
+            "version": "==0.1.16"
         },
         "mktheapidocs": {
             "hashes": [
@@ -1387,7 +1387,7 @@
                 "sha256:5b26757dc6f79a3b7dc9fab95359328d5747fcb2409d331ea66d0272b90ab2a0",
                 "sha256:8b995ffe925347a2138d7ac0fe77155e4311a0ea6d6da4f5128fe4b3cbe5ed71"
             ],
-            "markers": "sys_platform == 'darwin'",
+            "markers": "platform_system == 'Darwin'",
             "version": "==0.1.0"
         },
         "argcomplete": {
