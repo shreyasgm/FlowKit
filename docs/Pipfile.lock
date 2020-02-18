@@ -660,10 +660,10 @@
         },
         "mktheapidocs": {
             "hashes": [
-                "sha256:d710b4fb086e0192ba1e2a36ce3659c4db633b08309674d0d7648f40bdc01562"
+                "sha256:5b9292ca2803a09aec946fa34b7afffb1792dacfcbcd861a748aa5b03a3c6113"
             ],
             "index": "pypi",
-            "version": "==0.1.10"
+            "version": "==0.1.11"
         },
         "more-itertools": {
             "hashes": [
@@ -1539,11 +1539,11 @@
         },
         "flask-appbuilder": {
             "hashes": [
-                "sha256:4d80d05b4219bd7dceaa89bb0b8e3ad5960a5eb8a0874e5cdb3a9475a066724c",
-                "sha256:58c755e0a4b32c72ed7a2020d1e139057d2b55aa4492ec9cbd1d90b5332ba068"
+                "sha256:695119e84c977676c2903a957559f0381b6b1ed034619568d2edf211c3deca19",
+                "sha256:e0d3e7a1e141a31a6e85002ac778840b7ff68cea0d07c4814b06ae5ed7f179e6"
             ],
             "markers": "python_version >= '3.6'",
-            "version": "==2.2.3"
+            "version": "==2.2.4rc1"
         },
         "flask-babel": {
             "hashes": [
